@@ -15,7 +15,6 @@ import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.item.Item;
 import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.util.Pair;
 
 import java.util.Collections;
 import java.util.IdentityHashMap;
@@ -49,8 +48,6 @@ public class AttributeBuilderCallback {
                             component = item.getAttributeModifiers();
                         }
 
-                        ImmutableList.Builder<AttributeModifiersComponent.Entry> modifierBuilder = modifierBuilder(component);
-
                         for (ItemProperty property : itemsToProperties.getOrDefault(item, Collections.emptyList())) {
                             if (property.unbreakable || property.shouldForceUnbreakable()) {
                                 UnbreakableComponent unbreakableComponent = builder.getOrCreate(
@@ -60,30 +57,16 @@ public class AttributeBuilderCallback {
                                 builder.add(DataComponentTypes.UNBREAKABLE, unbreakableComponent);
                             }
 
-                            applyModifiers(modifierBuilder, property);
+                            component = applyModifiers(component, property);
                         }
 
-                        builder.add(
-                                DataComponentTypes.ATTRIBUTE_MODIFIERS,
-                                new AttributeModifiersComponent(
-                                        modifierBuilder.build(),
-                                        component.showInTooltip()
-                                )
-                        );
+                        builder.add(DataComponentTypes.ATTRIBUTE_MODIFIERS, component);
                     }
             );
         });
     }
 
-    private static ImmutableList.Builder<AttributeModifiersComponent.Entry> modifierBuilder(AttributeModifiersComponent base) {
-        ImmutableList.Builder<AttributeModifiersComponent.Entry> builder = ImmutableList.builderWithExpectedSize(base.modifiers().size());
-        for (AttributeModifiersComponent.Entry entry : base.modifiers()) {
-            builder.add(entry);
-        }
-        return builder;
-    }
-
-    private static void applyModifiers(ImmutableList.Builder<AttributeModifiersComponent.Entry> builder, ItemProperty property) {
+    private static AttributeModifiersComponent applyModifiers(AttributeModifiersComponent component, ItemProperty property) {
         for (GenericAttribute<?, ?> generic_attribute : property.attribute_overrides) {
             try {
                 RegistryEntry<EntityAttribute> attribute = generic_attribute.getAttribute();
@@ -92,21 +75,21 @@ public class AttributeBuilderCallback {
                     AttributeModifierSlot slot = AttributeModifierSlot.CODEC.decode(JsonOps.INSTANCE, new JsonPrimitive(slotID))
                             .getOrThrow()
                             .getFirst();
-                    builder.add(
-                            new AttributeModifiersComponent.Entry(
-                                    attribute,
-                                    new EntityAttributeModifier(
-                                            generic_attribute.getId(),
-                                            generic_attribute.getDouble(),
-                                            generic_attribute.getOperation()
-                                    ),
-                                    slot
-                            )
+                    component = component.with(
+                            attribute,
+                            new EntityAttributeModifier(
+                                    generic_attribute.getId(),
+                                    generic_attribute.getDouble(),
+                                    generic_attribute.getOperation()
+                            ),
+                            slot
                     );
                 }
             } catch (Exception e) {
                 CustomItemAttributes.LOGGER.error("Error adding attribute modifier: " + e.getMessage());
             }
         }
+
+        return component;
     }
 }
