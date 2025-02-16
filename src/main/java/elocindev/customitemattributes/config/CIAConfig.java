@@ -59,8 +59,8 @@ public class CIAConfig {
                 "offhand"
             ),
             List.of(
-                new GenericAttribute<>("minecraft:generic.attack_damage", 10.0, "ADDITION"),
-                new GenericAttribute<>("minecraft:generic.attack_speed", 0.20, "MULTIPLY_BASE")
+                new GenericAttribute<>("minecraft:generic.attack_damage", 10.0, "add_value", "examplemod:attack_damage_modifier_id"),
+                new GenericAttribute<>("minecraft:generic.attack_speed", 0.20, "add_multiplied_base", "examplemod:attack_speed_modifier_id")
             )
         )
     );
