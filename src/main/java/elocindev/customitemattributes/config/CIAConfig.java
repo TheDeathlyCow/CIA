@@ -38,7 +38,7 @@ public class CIAConfig {
     @Comment("      attribute   :           The Identifier of the attribute. You can get it using the autocomplete of the /attribute command.")
     @Comment("      value       :           The value of the desired attribute. You can use negatives too, must be a decimal number.")
     @Comment("      id          :           The identifier of the modifier. Can be any valid Identifier.")
-    @Comment("      operation   :           The operation to calculate the attribute. One of add_value`, add_multiplied_base, or add_multiplied_total.")
+    @Comment("      operation   :           The operation to calculate the attribute. One of add_value, add_multiplied_base, or add_multiplied_total.")
     @Comment("      unbreakable :           Whether or not the item should be unbreakable.")
     @Comment("      force_unbreakable :     Force the unbreakable tag over other mods. Setting this to true will break the Hardening Catalyst from Things from being used on that item!")
     @Comment("---------------------------------------------------------------------------------------------------------------------------------")
