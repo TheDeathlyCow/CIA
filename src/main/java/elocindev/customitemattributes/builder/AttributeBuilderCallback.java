@@ -5,6 +5,7 @@ import com.mojang.serialization.JsonOps;
 import elocindev.customitemattributes.CustomItemAttributes;
 import elocindev.customitemattributes.api.GenericAttribute;
 import elocindev.customitemattributes.api.ItemProperty;
+import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.item.v1.DefaultItemComponentEvents;
 import net.minecraft.component.ComponentMap;
 import net.minecraft.component.DataComponentTypes;
@@ -15,6 +16,7 @@ import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.item.Item;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.util.Identifier;
 
 import java.util.Collections;
 import java.util.IdentityHashMap;
@@ -24,6 +26,8 @@ import java.util.stream.Collectors;
 
 public class AttributeBuilderCallback {
     public static void register() {
+        DefaultItemComponentEvents.MODIFY.addPhaseOrdering(Event.DEFAULT_PHASE, Identifier.of(CustomItemAttributes.MOD_ID, "after_default"));
+
         DefaultItemComponentEvents.MODIFY.register(modifyContext -> {
             Map<Item, List<ItemProperty>> itemsToProperties = CustomItemAttributes.CONFIG.items.stream()
                     .filter(property -> property.getItem() != null)

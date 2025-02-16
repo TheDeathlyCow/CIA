@@ -71,5 +71,5 @@ public class CIAConfig {
     );
 
     @Comment("Don't touch this!")
-    public int CONFIG_VERSION = 2;
+    public int CONFIG_VERSION = 3;
 }
