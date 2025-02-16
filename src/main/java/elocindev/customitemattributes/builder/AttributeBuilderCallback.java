@@ -1,12 +1,12 @@
 package elocindev.customitemattributes.builder;
 
-import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonPrimitive;
 import com.mojang.serialization.JsonOps;
 import elocindev.customitemattributes.CustomItemAttributes;
 import elocindev.customitemattributes.api.GenericAttribute;
 import elocindev.customitemattributes.api.ItemProperty;
 import net.fabricmc.fabric.api.item.v1.DefaultItemComponentEvents;
+import net.minecraft.component.ComponentMap;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.AttributeModifierSlot;
 import net.minecraft.component.type.AttributeModifiersComponent;
@@ -35,35 +35,40 @@ public class AttributeBuilderCallback {
                             )
                     );
 
-            modifyContext.modify(
-                    itemsToProperties::containsKey,
-                    (builder, item) -> {
-                        AttributeModifiersComponent component = builder.getOrDefault(
-                                DataComponentTypes.ATTRIBUTE_MODIFIERS,
-                                AttributeModifiersComponent.DEFAULT
-                        );
-
-                        if (component.modifiers().isEmpty()) {
-                            // this is where the default attributes of armor is stored for some god forsaken reason
-                            component = item.getAttributeModifiers();
+            modifyContext.modify(itemsToProperties::containsKey, (builder, item) -> {
+                        List<ItemProperty> properties = itemsToProperties.getOrDefault(item, Collections.emptyList());
+                        if (!properties.isEmpty()) {
+                            modifyItemComponents(builder, item, properties);
                         }
-
-                        for (ItemProperty property : itemsToProperties.getOrDefault(item, Collections.emptyList())) {
-                            if (property.unbreakable || property.shouldForceUnbreakable()) {
-                                UnbreakableComponent unbreakableComponent = builder.getOrCreate(
-                                        DataComponentTypes.UNBREAKABLE,
-                                        () -> new UnbreakableComponent(true)
-                                );
-                                builder.add(DataComponentTypes.UNBREAKABLE, unbreakableComponent);
-                            }
-
-                            component = applyModifiers(component, property);
-                        }
-
-                        builder.add(DataComponentTypes.ATTRIBUTE_MODIFIERS, component);
                     }
             );
         });
+    }
+
+    private static void modifyItemComponents(ComponentMap.Builder builder, Item item, List<ItemProperty> properties) {
+        AttributeModifiersComponent component = builder.getOrDefault(
+                DataComponentTypes.ATTRIBUTE_MODIFIERS,
+                AttributeModifiersComponent.DEFAULT
+        );
+
+        if (component.modifiers().isEmpty()) {
+            // this is where the default attributes of armor is stored for some god forsaken reason
+            component = item.getAttributeModifiers();
+        }
+
+        for (ItemProperty property : properties) {
+            if (property.unbreakable || property.shouldForceUnbreakable()) {
+                UnbreakableComponent unbreakableComponent = builder.getOrCreate(
+                        DataComponentTypes.UNBREAKABLE,
+                        () -> new UnbreakableComponent(true)
+                );
+                builder.add(DataComponentTypes.UNBREAKABLE, unbreakableComponent);
+            }
+
+            component = applyModifiers(component, property);
+        }
+
+        builder.add(DataComponentTypes.ATTRIBUTE_MODIFIERS, component);
     }
 
     private static AttributeModifiersComponent applyModifiers(AttributeModifiersComponent component, ItemProperty property) {
@@ -86,7 +91,7 @@ public class AttributeBuilderCallback {
                     );
                 }
             } catch (Exception e) {
-                CustomItemAttributes.LOGGER.error("Error adding attribute modifier: " + e.getMessage());
+                CustomItemAttributes.LOGGER.error("Error adding attribute modifier: {}", e.getMessage());
             }
         }
 

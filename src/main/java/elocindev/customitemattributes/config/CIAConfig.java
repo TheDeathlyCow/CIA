@@ -37,16 +37,22 @@ public class CIAConfig {
     @Comment("      slot        :           A list of slots where the attributes should be applied.")
     @Comment("      attribute   :           The Identifier of the attribute. You can get it using the autocomplete of the /attribute command.")
     @Comment("      value       :           The value of the desired attribute. You can use negatives too, must be a decimal number.")
+    @Comment("      id          :           The identifier of the modifier. Can be any valid Identifier.")
     @Comment("      operation   :           The operation to calculate the attribute. Addition or Multiply.")
     @Comment("      unbreakable :           Whether or not the item should be unbreakable.")
     @Comment("      force_unbreakable :     Force the unbreakable tag over other mods. Setting this to true will break the Hardening Catalyst from Things from being used on that item!")
     @Comment("---------------------------------------------------------------------------------------------------------------------------------")
     @Comment("Slots:")
+    @Comment("      any         :   Applies to any slot.")
     @Comment("      mainhand    :   The main hand slot.")
     @Comment("      offhand     :   The off hand slot.")
+    @Comment("      hand        :   Applies to either hand slot.")
     @Comment("      head        :   The head slot.")
     @Comment("      chest       :   The chest slot.")
     @Comment("      legs        :   The legs slot.")
+    @Comment("      feet        :   The feet slot.")
+    @Comment("      armor       :   Applies to the head/chest/legs/feet slots.")
+    @Comment("      body        :   Used for Wolf/Horse armor")
     @Comment("------------------------------------------------------------------------------------------------------------------------------")
     @Comment("The example showcases a config to add +10 attack damage and +20% attack speed to an \"example_item\", on both the main hand and off hand.")
     @Comment("Each of the attributes are overrides for modifiers of the same attribute type, depending on each slot correspondingly.")
@@ -55,8 +61,7 @@ public class CIAConfig {
         new ItemProperty(
             "examplemod:example_item",
             List.of(
-                "mainhand",
-                "offhand"
+                "hand"
             ),
             List.of(
                 new GenericAttribute<>("minecraft:generic.attack_damage", 10.0, "add_value", "examplemod:attack_damage_modifier_id"),
