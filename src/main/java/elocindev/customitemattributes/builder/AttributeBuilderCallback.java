@@ -26,9 +26,11 @@ import java.util.stream.Collectors;
 
 public class AttributeBuilderCallback {
     public static void register() {
-        DefaultItemComponentEvents.MODIFY.addPhaseOrdering(Event.DEFAULT_PHASE, Identifier.of(CustomItemAttributes.MOD_ID, "after_default"));
+        // run this after most other mods
+        Identifier phase = Identifier.of(CustomItemAttributes.MOD_ID, "after_default");
+        DefaultItemComponentEvents.MODIFY.addPhaseOrdering(Event.DEFAULT_PHASE,phase );
 
-        DefaultItemComponentEvents.MODIFY.register(modifyContext -> {
+        DefaultItemComponentEvents.MODIFY.register(phase, modifyContext -> {
             Map<Item, List<ItemProperty>> itemsToProperties = CustomItemAttributes.CONFIG.items.stream()
                     .filter(property -> property.getItem() != null)
                     .collect(
